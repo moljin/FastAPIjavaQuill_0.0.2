@@ -24,7 +24,7 @@ def index(request: Request,
              "now_time_utc": _NOW_TIME_UTC,
              "now_time": _NOW_TIME,
              'current_user': current_user,
-             # 'admin': is_admin(current_user)
+             'admin': is_admin(current_user)
              }
 
     return templates.TemplateResponse(template,context)

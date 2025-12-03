@@ -18,4 +18,4 @@ class LottoNum(BaseModel):
     lotto_num_list: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     def __repr__(self):
-        return f"<LottoNum(id={self.id}, email='{self.title}')>"
+        return f"<LottoNum(id={self.id}, title='{self.title}')>"

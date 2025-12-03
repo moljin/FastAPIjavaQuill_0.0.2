@@ -110,3 +110,6 @@ class ArticleComment(BaseModel):
             .correlate(cls)
             .scalar_subquery()
         )
+
+    def __repr__(self):
+        return f"<ArticleComment(id={self.id}, author_id={self.author_id}, created_at={self.created_at})>"

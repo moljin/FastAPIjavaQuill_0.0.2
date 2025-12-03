@@ -16,6 +16,9 @@ class User(BaseModel):
     img_path: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
+    def __repr__(self):
+        return f"<User(id={self.id}, username='{self.username}', email='{self.email}')>"
+
 """
 - unique 와 index 중복
     - unique=True만으로도 고유 인덱스가 생성됩니다. index=True는 중복이므로 제거해도 됩니다(권장).
