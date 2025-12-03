@@ -1,0 +1,196 @@
+/*기본 스타일 시작*/
+.index.most-outer {
+    border: 1px solid lightgrey;
+    border-radius: 7px;
+    height: 150px;
+    display: flex;
+    padding: 10px 0;
+}
+
+.index.most-outer .inner-left {
+    width: 20%;
+}
+
+.index.most-outer .inner-left .thumbnail {
+    padding-left: 10px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;, margin: 0 auto;
+}
+
+.index.most-outer .inner-left .thumbnail img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
+.index.most-outer .inner-right {
+    width: 80%;
+    padding-right: 10px;
+}
+
+.index.most-outer .inner-right .upper {
+    height: 80%;
+}
+
+.index.most-outer .inner-right .lower {
+    display: flex;
+    height: 10%;
+    justify-content: right;
+}
+
+.index.most-outer .inner-right .upper .title {
+    padding-left: 20px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.index.most-outer .inner-right .upper .content {
+    padding-left: 20px;
+    /* 코드/긴 문자열도 줄바꿈 되도록...*/
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.index.most-outer .inner-right .lower .created {
+    margin-left: 10px;
+}
+
+@media (max-width: 1000px) {
+    .index.most-outer .inner-left {
+        width: 30%;
+    }
+    .index.most-outer .inner-right {
+        width: 70%;
+    }
+}
+@media (max-width: 720px) {
+    .index.most-outer .inner-right .upper .title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal;
+        text-align: left;
+        word-wrap: break-word;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+    }
+}
+
+@media (max-width: 650px) {
+    .index.most-outer .inner-left {
+        width: 40%;
+    }
+    .index.most-outer .inner-right {
+        width: 60%;
+    }
+
+    .index.most-outer .inner-right .upper .content {
+        /*<!--두줄로 truncate하기-->*/
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal;
+        text-align: left;
+        word-wrap: break-word;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+}
+
+@media (max-width: 490px) {
+    .index.most-outer .inner-right .upper {
+        height: 60%;
+    }
+    .index.most-outer .inner-right .lower {
+        display: block;
+        text-align: right;
+    }
+}
+
+@media (max-width: 470px) {
+    .index.most-outer .inner-left {width: 50%}
+    .index.most-outer .inner-right {width: 50%;}
+}
+/*기본 스타일 끝*/
+
+/*pagination start*/
+.uk-pagination > li > a,
+.uk-pagination > li > span {
+    min-width: 36px;
+    text-align: center;
+}
+
+.uk-pagination > .uk-active > * {
+    color: red
+}
+
+.prev-li .prev {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.next-li .next {
+    display: flex;
+    align-items: center;
+    padding-left: 5px;
+}
+
+.next-li a.next {
+    justify-content: center;
+}
+
+.next-li a.cursor.next {
+    justify-content: right;
+}
+
+li.uk-disabled.next-li > span {
+    justify-content: center;
+}
+
+@media (min-width: 400px) { /*페이지 당 몇개 간격*/
+    .uk-form-horizontal .uk-form-label {
+        width: 80px;
+        margin-top: 7px;
+        float: left;
+        font-size: 16px;
+    }
+}
+@media (min-width: 400px) { /*페이지 당 몇개 간격*/
+    .uk-form-horizontal .uk-form-controls {
+        margin-left: 80px;
+    }
+}
+/*pagination end*/
+
+/*검색 start*/
+.articles-search-bar {
+    margin: 12px 0 20px 0;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.articles-search-bar input[type="text"] {
+    flex: 1;
+}
+
+.articles-search-bar button.uk-button-primary {
+    border: #30336b;
+    background-color: #6A626B;
+    color: white;
+    font-size: 16px;
+    padding: 0 22.5px
+}
+
+.articles-search-bar button.uk-button-primary:hover {
+    background-color: #615463;
+}
+
+.articles-search-bar a.uk-button-default {
+    font-size: 16px;
+    padding: 0 13.5px
+}
+/*검색 end*/

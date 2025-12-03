@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}
+    ETC
+{% endblock %}
+
+{% block main %}
+    <article class="main flex-item contents-container" xmlns="http://www.w3.org/1999/html">
+        <div class="mt-10">
+            <div class="object-container">
+                <h2 style="text-align: center"><strong>ETC related Development</strong></h2>
+                <p>
+                    <a href="https://fastapi.tiangolo.com/ko/tutorial/" target="_blank">FastAPI 자습서 - 사용자 안내서</a> <br>
+                    <a href="https://nh0404.tistory.com/43" target="_blank">CSS로 글자수 넘어가면 말줄임표 만들기...</a> <br>
+                    <a href="https://velog.io/@soor/CSS-position-sticky-%EB%8F%99%EC%9E%91%ED%95%98%EC%A7%80-%EC%95%8A%EC%9D%84-%EB%95%8C-%EC%9D%B4%EA%B2%83%EB%B6%80%ED%84%B0-%EB%B3%B4%EC%9E%90"
+                       target="_blank">position: sticky 동작하지 않을 때</a> <br>
+                    <a href="https://yebeen-study-note.tistory.com/35" target="_blank">[ HTML ] 공백 넣기(띄어쓰기), 줄 바꿈하는 법</a> <br>
+
+
+                </p>
+                <p>
+                    <strong>pycharm에서 .jshintrc 파일적용시키는 방법</strong> <br>
+                    ---. .jshintrc 파일의 위치는 프로젝트 폴더 아래(main.py와 동일한 위치) <br>
+                    ---. settings > Languages & Frameworks -> JavaScript -> Code Quality Tools -> JSHint ->Enable JSHint와 Use config files 체크박스를 활성화
+                </p>
+                <p>
+                    <strong>Highlighter Module</strong>
+                <pre>
+# html 파일
+&lt;!-- Include your favorite highlight.js stylesheet --&gt;
+&lt;link&gt; href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" rel="stylesheet"&lt;/link&gt;
+
+&lt;!-- Include the highlight.js library --&gt;
+&lt;script&gt; src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js">&lt;/script&gt;
+
+# js 파일
+const quill = new Quill('#editor', {
+    theme: 'snow',
+    modules: {
+        syntax: true, // Include syntax module
+        toolbar: [['code-block']] // Include button in toolbar
+        },
+    });
+</pre>
+                <pre>
+# My Customizing
+const baseToolbar = [
+    ['bold', 'italic', 'underline', 'strike'],
+    ['link', 'image', 'video'],
+    [{'header': 1}, {'header': 2}, {'header': 3}],
+    [{'list': 'ordered'}, {'list': 'bullet'}, {'list': 'check'}, {'indent': '-1'}, {'indent': '+1'}],
+    ['blockquote', 'code-block'],
+    [{'script': 'sub'}, {'script': 'super'}, 'formula'],
+    [{'color': []}, {'background': []}, {'align': ['', 'center', 'right', 'justify']}],
+];
+
+const quillModulesConfig = {
+        syntax: true,              // Highlight syntax module
+        toolbar: {
+            container: baseToolbar,
+            handlers: {
+                image: imageInsertByToolbarButton,
+                video: videoInsertByToolbarButton,
+            }
+        },
+        imageResize: {
+            modules: ['Resize', 'DisplaySize', 'Toolbar'],
+            displayStyles: {backgroundColor: 'black', border: 'none', color: 'white'},
+            handleStyles: {backgroundColor: '#fff', border: '1px solid #777', width: '10px', height: '10px'}
+        },
+        quillCustomizer: {
+        objectId: typeof _objectID !== "undefined" ? _objectID : null,
+        initialContent: typeof _editorContent !== "undefined" ? _editorContent : null
+        },
+    };
+
+const quill = new Quill(editorElement, {
+        theme: 'snow',
+        placeholder: '여기에 내용을 입력하세요...',
+        modules: quillModulesConfig
+    });
+</pre>
+
+<pre>
+(.venv) PS D:\Python_FastAPI\My_Advanced\FastAPIjavaQuill_0.0.1> python
+Python 3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>> from app.core.database import AsyncSessionLocal
+>>> from app.models.articles import Article
+>>> from datetime import datetime
+>>> from datetime import timezone
+>>> import asyncio
+>>> db = AsyncSessionLocal()
+>>> for i in range(300):
+...     q = Article(title='테스트 데이터입니다.', content='내용무', author_id=1, created_at=datetime.now(timezone.utc))
+...     db.add(q)
+>>> asyncio.run(db.commit())
+</pre>
+<pre>
+(.venv) PS D:\Python_FastAPI\My_Advanced\FastAPIjavaQuill_0.0.1> python
+Python 3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import secrets
+>>> secrets.token_hex(35)
+</pre>
+
+            </div>
+        </div>
+
+    </article>
+{% endblock %}

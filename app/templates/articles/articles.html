@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}
+    게시글 목록
+{% endblock %}
+
+{% block sub_css %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}/statics/css/custom/articles/articles.css"> <!--reply quill 용으로 추가-->
+
+    <style>
+
+
+    </style>
+{% endblock %}
+
+{% block main %}
+    <article class="main contents-container">
+        <div class="object-container">
+            <h2><strong>게시글 목록</strong></h2>
+            <!-- 검색 폼 Jinja 템플릿 용-->
+            <form class="articles-search-bar" method="get" action="{{ url_for('get_articles') }}">
+                <input class="uk-input" type="text" name="query" placeholder="검색어를 입력하세요 (제목/내용/작성자/댓글)" value="{{ request.query_params.get('query','') }}">
+                <!-- 현재 목록 파라미터 유지 -->
+                <input type="hidden" name="mode" value="{{ request.query_params.get('mode','auto') }}">
+                <input type="hidden" name="size" value="{{ request.query_params.get('size','10') }}">
+                <!-- offset 모드 -->
+                <input type="hidden" name="page" value="1">
+                <!-- cursor 모드 -->
+                <input type="hidden" name="_dir" value="{{ request.query_params.get('_dir','next') }}">
+                {% if request.query_params.get('cursor') %}
+                    <input type="hidden" name="cursor" value="{{ request.query_params.get('cursor') }}">
+                {% endif %}
+                <button type="submit" class="uk-button uk-button-primary">검색</button>
+                {% if request.query_params.get('query') %}
+                    <a class="uk-button uk-button-default" href="{{ url_for('get_articles') }}?mode={{ request.query_params.get('mode','auto') }}&size={{ request.query_params.get('size','10') }}">초기화</a>
+                {% endif %}
+            </form>
+
+            <!-- 검색 폼 자바스크립트 용-->
+{#            <form class="articles-search-bar" id="searchForm">#}
+{#                <input class="uk-input" type="text" name="query" id="searchQuery" placeholder="검색어를 입력하세요 (제목/내용/작성자/댓글)" value="{{ request.query_params.get('query','') }}">#}
+{#                <!-- 현재 목록 파라미터 유지 -->#}
+{#                <input type="hidden" name="mode" id="searchMode" value="{{ request.query_params.get('mode','auto') }}">#}
+{#                <input type="hidden" name="size" id="searchSize" value="{{ request.query_params.get('size','10') }}">#}
+{#                <!-- offset 모드 -->#}
+{#                <input type="hidden" name="page" id="searchPage" value="1">#}
+{#                <!-- cursor 모드 -->#}
+{#                <input type="hidden" name="_dir" id="searchDir" value="{{ request.query_params.get('_dir','next') }}">#}
+{#                {% if request.query_params.get('cursor') %}#}
+{#                    <input type="hidden" name="cursor" id="searchCursor" value="{{ request.query_params.get('cursor') }}">#}
+{#                {% endif %}#}
+{#                <button type="button" id="searchBtn" class="uk-button uk-button-primary">검색</button>#}
+{#                {% if request.query_params.get('query') %}#}
+{#                    <a type="button" id="resetBtn" class="uk-button uk-button-default">초기화</a>#}
+{#                {% endif %}#}
+{#            </form>#}
+
+
+            <!-- 페이지 크기 선택/총 개수 -->
+            <div class="uk-flex uk-flex-middle uk-flex-between uk-margin">
+                <div>
+                    총 {{ pagination.total_count }}개
+                </div>
+                <form method="get" class="uk-form-horizontal uk-margin-remove">
+                    {# 현재 쿼리 파라미터 유지 (query, cursor, _dir 등) #}
+                    {% for key, value in request.query_params.multi_items() %}
+                        {% if key not in ['size', 'page', 'mode'] %}
+                            <input type="hidden" name="{{ key }}" value="{{ value }}">
+                        {% endif %}
+                    {% endfor %}
+
+                    {# size 변경 시 첫 페이지로 이동 + offset 모드로 강제 #}
+                    {% if pagination.mode == 'cursor' %}
+                        <!-- 커서 모드에서도 size 변경 시 offset 첫 페이지로 돌아가도록 page=1 -->
+                        <input type="hidden" name="mode" value="offset">
+                        <input type="hidden" name="page" value="1">
+                    {% else %}
+                        <input type="hidden" name="page" value="1">
+                        <input type="hidden" name="mode" value="{{ pagination.mode or 'offset' }}">
+                    {% endif %}
+
+                    <label class="uk-form-label" for="size">페이지 당</label>
+                    <div class="uk-form-controls">
+                        <select name="size" id="size" class="uk-select" onchange="this.form.submit()">
+                            {% for opt in [5,10,20,30,50,100] %}
+                                <option value="{{ opt }}" {% if opt == pagination.size %}selected{% endif %}>{{ opt }}개</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </form>
+
+            </div>
+
+            <!-- 게시글 카드 목록 -->
+            {% for article in all_articles %}
+                <div class="index most-outer uk-margin">
+                    <div class="inner-left">
+                        <a href="/views/articles/article/{{ article.id }}">
+                            <div class="thumbnail">
+                                {% if article.img_path %}
+                                    <img src="{{ MEDIA_URL }}/{{ article.img_path }}" alt="Article Image">
+                                {% else %}
+                                    <img src="{{ MEDIA_URL }}/default/blog_default.png" alt="Article Image">
+                                {% endif %}
+                            </div>
+                        </a>
+                    </div>
+                    <div class="inner-right">
+
+                        <div class="upper">
+                            <a href="/views/articles/article/{{ article.id }}">
+                                <div class="title">{{ article.title }}</div>
+                            </a>
+                            <div class="content">{{ article.content | striptags | truncate(100) }}</div>
+                        </div>
+                        <div class="lower">
+                            <div class="username">{{ article.author.username }} : <strong>{{ article.id }}</strong></div>
+                            <div class="created">( {{ article.created_at | to_kst }} )</div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <!-- 페이지네이션 -->
+            {% if pagination.mode == 'offset' %}
+
+                <ul class="uk-pagination uk-flex-center" uk-margin>
+                    <li class="{% if not pagination.has_prev %}uk-disabled{% endif %} prev-li">
+                        {% if pagination.has_prev %}
+                            <a class="prev" href="{{ pagination.prev_href }}"><span uk-pagination-previous></span></a>
+                        {% else %}
+                            {% if pagination.page_range != [1] %} <!--페이지가 한개뿐이면 페이지네이션 자체 안보이게...-->
+                                <span class="prev"><span uk-pagination-previous></span></span>
+                            {% endif %}
+                        {% endif %}
+                    </li>
+                    {% if pagination.page_range != [1] %} <!--페이지가 한개뿐이면 페이지네이션 자체 안보이게...-->
+                        {% for p in pagination.page_range %}
+                            <li class="{% if p == pagination.page %}uk-active{% endif %}">
+
+                                {% if p == pagination.page %}
+                                    <span>{{ p }}</span>
+                                {% else %}
+                                    {#                                    <a href="?page={{ p }}&size={{ pagination.size }}&mode=offset">{{ p }}</a>#}
+                                    {# 검색조건을 포함한 페이지 링크 생성 #}
+                                    {% set page_url = "?page=" + p|string + "&size=" + pagination.size|string + "&mode=offset" %}
+                                    {% if request.query_params.get('query') %}
+                                        {% set page_url = page_url + "&query=" + request.query_params.get('query')|urlencode %}
+                                    {% endif %}
+                                    <a href="{{ page_url }}">{{ p }}</a>
+
+                                {% endif %}
+
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+
+                    <li class="{% if not pagination.has_next %}uk-disabled{% endif %} next-li">
+                        {% if pagination.has_next %}
+                            <a class="next" href="{{ pagination.next_href }}"><span uk-pagination-next></span></a>
+                        {% else %}
+                            {% if pagination.page_range != [1] %} <!--페이지가 한개뿐이면 페이지네이션 자체 안보이게...-->
+                                <span class="next"><span uk-pagination-next></span></span>
+                            {% endif %}
+                        {% endif %}
+                    </li>
+                </ul>
+                <!--개발시 풀면, 오프셋과 커서 변환 구분할 수 있다.-->
+                <!--div class="uk-text-center uk-text-muted">
+                    페이지 {{ pagination.page }} / {{ pagination.total_pages }}
+                    {% if pagination.deep_page_threshold %} · 임계: {{ pagination.deep_page_threshold }}{% endif %}
+                </div-->
+            {% else %}
+                <!-- 커서 모드: Prev/Next 중심 -->
+                <ul class="uk-pagination uk-flex-center" uk-margin>
+                    <li class="{% if not pagination.has_prev %}uk-disabled{% endif %}">
+                        {% if pagination.has_prev and pagination.prev_href %}
+                            <a href="{{ pagination.prev_href }}"><span uk-pagination-previous></span></a>
+                        {% else %}
+                            <span><span uk-pagination-previous></span></span>
+                        {% endif %}
+                    </li>
+
+                    <li class="uk-active">
+                        <span>
+                            {% if pagination.approx_page %}{{ pagination.approx_page }}{% else %}-{% endif %} / {{ pagination.total_pages }}
+                        </span>
+                    </li>
+
+                    <li class="{% if not pagination.has_next %}uk-disabled{% endif %} next-li">
+                        {% if pagination.has_next and pagination.next_href %}
+                            <a class="cursor next" href="{{ pagination.next_href }}"><span uk-pagination-next></span></a>
+                        {% else %}
+                            <span class='cursor next'><span uk-pagination-next></span></span>
+                        {% endif %}
+                    </li>
+                </ul>
+                <!--개발시 풀면, 오프셋과 커서 변환 구분할 수 있다.-->
+                <!--div class="uk-text-center uk-text-muted">
+                    빠른 탐색 모드(커서 페이지네이션)
+                </div-->
+            {% endif %}
+
+        </div>
+{#        <script type="module" src="{{ STATIC_URL }}/statics/js/custom/search.js"></script>#}
+
+    </article>
+{% endblock %}

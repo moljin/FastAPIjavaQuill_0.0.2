@@ -1,0 +1,43 @@
+<article class="flex-item rt-container">
+    <div class="side-item">
+        <div class="inner">
+            <div><a href="/server">서버 개발 관련</a></div>
+            <div><a href="/docker">우분투 도커 셋팅</a></div>
+            <div><a href="/etc">기타 개발 관련</a></div>
+
+            {% if current_user and admin %}
+                <hr>
+                <div><a href="/lotto/win/extract">로또 최다 당첨번호 추출하기</a></div>
+                <div><a href="/lotto/top10">로또 Top10 예측</a></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="side-item">
+        <div class="inner">
+            {% if current_user %}
+                <div><strong>{{ current_user.username }}님</strong></div>
+                <div><a href="/views/accounts/account/{{ current_user.id }}"> 상세정보(탈퇴 포함)</a></div>
+                <hr>
+
+                <div><a href="/views/accounts/username/update/{{ current_user.id }}">닉네임 변경</a></div>
+                <div><a href="/views/accounts/email/update/{{ current_user.id }}">이메일 변경</a></div>
+                <div><a href="/views/accounts/profile/image/update/{{ current_user.id }}">프로필 이미지 변경</a></div>
+                <div><a href="/views/accounts/password/update/{{ current_user.id }}">비밀번호 변경</a></div>
+
+            {% else %}
+                <div><a href="/views/accounts/lost/password/reset"> 비밀번호 분실</a></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="side-item">
+        <div class="inner">
+            <div><a href="/views/articles/article/1">1번 게시글 상세 페이지</a></div>
+            <div><a href="/views/articles/article/update/1">1번 게시글 수정페이지</a></div>
+            <hr>
+            <div><a href="/views/accounts/account/1">1번 회원 상세정보</a></div>
+            <div><a href="/views/accounts/account/update/1">1번 회원정보 수정</a></div>
+        </div>
+    </div>
+</article>

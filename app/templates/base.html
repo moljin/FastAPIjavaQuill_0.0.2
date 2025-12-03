@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block main_css %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}/statics/css/custom/reset.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}/statics/css/custom/main.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}/uikit/css/uikit.min.css">
+{% endblock %}
+
+{% block main_js %}
+    <script src="{{ STATIC_URL }}/uikit/js/uikit.min.js"></script>
+    <script src="{{ STATIC_URL }}/uikit/js/uikit-icons.min.js"></script>
+{% endblock %}
+
+
+{% block header %}
+    {% include 'includes/header.html' %}
+{% endblock %}
+
+{% block main_right %}
+    {% include 'includes/left.html' %}
+{% endblock %}
+
+{% block main_left %}
+    {% include 'includes/right.html' %}
+{% endblock %}
+
+{% block footer %}
+    {% include 'includes/footer.html' %}
+{% endblock %}
+
+{% block end_common_js %}
+    <script type="module" src="{{ STATIC_URL }}/statics/js/main.js"></script>
+    {% if current_user %}
+    <script type="module" src="{{ STATIC_URL }}/statics/js/custom/accounts/logout.js"></script>
+    {% endif %}
+{% endblock %}

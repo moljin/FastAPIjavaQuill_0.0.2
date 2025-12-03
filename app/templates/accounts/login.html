@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}
+    로그인
+{% endblock %}
+
+{% block sub_css %}
+	<link rel="stylesheet" href="{{ STATIC_URL }}/statics/css/custom/form.css">
+    <style>
+    .add-container {display: flex; justify-content: space-between;}
+    </style>
+{% endblock %}
+
+{% block main %}
+    <article class="main flex-item contents-container">
+        <div class="form-container login-container mt-10">
+            <h2>로그인</h2>
+            <hr class="hr-bold">
+            <div class="uk-margin" id="errorTag"><!--js에서 넘어온 오류 메시지를 넣는다.--></div>
+            <form id="accountForm">
+                <div class="uk-margin">
+                    <input class="uk-input"  id="email" type="text" placeholder="email" name="email" required>
+                </div>
+                <div class="uk-margin"><input class="uk-input" id="password" type="password" placeholder="Password" name="password" required></div>
+                <div class="uk-margin"><button type="submit" class="login-btn">로 그 인</button></div>
+            </form>
+            <div class="add-container">
+                <div>
+                    <a href="/views/accounts/register">아직 가입을 하지 않으셨나요?</a>
+                </div>
+                <div>
+                    <a href="/views/accounts/lost/password/reset"> 비밀번호를 잊으셨나요?</a>
+                </div>
+            </div>
+            <script type="module" src="{{ STATIC_URL }}/statics/js/custom/accounts/login.js"></script>
+        </div>
+    </article>
+{% endblock %}
+
+
+

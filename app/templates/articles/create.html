@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}
+    글쓰기
+{% endblock %}
+
+{% block sub_css %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}/statics/css/custom/form.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}/quills/highlight/atom-one-dark.min.css"> <!--highlight.js stylesheet-->
+    <link rel="stylesheet" href="{{ STATIC_URL }}/quills/v_2.0.3/quill.snow.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}/quills/custom/quill_main.css">
+    <style>
+
+    </style>
+{% endblock %}
+
+{% block sub_js %}
+    <script src="{{ STATIC_URL }}/quills/highlight/highlight.min.js"></script> <!-- highlight.js library -->
+    <script>
+        window.ARTICLE_CONTENT = {{ (article.content if article else '') | tojson }};
+    </script>
+{% endblock %}
+
+{% block main %}
+    <article class="main flex-item contents-container">
+        <div class="form-container article-container mt-10">
+            {% if article %}
+                <h2>게시글 수정</h2>
+            {% else %}
+                <h2>게시글 쓰기</h2>
+            {% endif %}
+            <hr class="hr-bold">
+            <div class="uk-margin" id="errorTag"><!--js에서 넘어온 오류 메시지를 넣는다.--></div>
+            <input id="markID" type="hidden" name="mark_id" value="{{ mark_id }}">
+            <form id="articleForm" enctype="multipart/form-data">
+                <div class="uk-margin">
+                    {% if article %}
+                        <input type="hidden" name="author_id" value="{{ article.author_id }}">
+                        <input id="article_id" type="hidden" name="article_id" value="{{ article.id }}">
+                    {% else %}
+                        <input type="hidden" name="author_id" value="{{ current_user.id }}">
+                    {% endif %}
+                </div>
+                <div class="uk-margin">
+                    {% if article %}
+                        <input class="uk-input" id="title" type="text" placeholder="제목" name="title" value="{{ article.title }}" required>
+                    {% else %}
+                        <input class="uk-input" id="title" type="text" placeholder="제목" name="title" required>
+                    {% endif %}
+
+                </div>
+                <div class="uk-margin">
+                    <label for="imagefile" class="form-label">썸네일: </label>
+                    <input id="imagefile" type="file" accept="image/*" class="form-control" name="imagefile"/>
+                </div>
+
+                <div id="editor-container">
+                    <div id="drop-area"></div>
+                    <div id="article-editor"></div>
+                </div>
+
+                <div class="cancel-submit">
+                    <div class="cancel" id="cancelBTN">작성취소</div>
+                    <button class="submit">글 올리기</button>
+                    {#                        <button class="create-btn">글 올리기</button>#}
+                </div>
+
+                <div>
+                    <script src="{{ STATIC_URL }}/quills/v_2.0.3/quill.js"></script>
+                    <!-- Quill 2 호환 ImageResize 모듈(예: quill-image-resize-module-v2 UMD 번들)
+                    https://github.com/henriqueformiga/quill-image-resize-module-v2/tree/master -->
+                    <script src="{{ STATIC_URL }}/quills/v_2.0.3/quill-image-resize-module-v2/image-resize.min.js"></script>
+                    <script type="module" src="{{ STATIC_URL }}/quills/custom/articles/create.js"></script>
+                </div>
+            </form>
+        </div>
+
+    </article>
+{% endblock %}

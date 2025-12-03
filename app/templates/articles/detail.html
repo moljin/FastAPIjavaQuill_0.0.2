@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}
+    게시글 보기
+{% endblock %}
+
+{% block sub_css %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}/statics/css/custom/form.css"> <!--reply quill 용으로 추가-->
+
+    <link rel="stylesheet" href="{{ STATIC_URL }}/quills/highlight/atom-one-dark.min.css"> <!--detail에도 기본--> <!--highlight.js stylesheet-->
+    <link rel="stylesheet" href="{{ STATIC_URL }}/quills/v_2.0.3/quill.snow.css"> <!--detail에도 기본-->
+    <link rel="stylesheet" href="{{ STATIC_URL }}/quills/custom/quill_main.css">  <!--reply quill 용으로 추가-->
+    <link rel="stylesheet" href="{{ STATIC_URL }}/quills/custom/post_quill_snow.css"> <!--detail에도 기본-->
+    <link rel="stylesheet" href="{{ STATIC_URL }}/statics/css/custom/articles/detail.css">
+    <style>
+
+
+    </style>
+{% endblock %}
+
+{% block sub_js %}
+    <script src="{{ STATIC_URL }}/quills/highlight/highlight.min.js"></script> <!--detail에도 기본--> <!-- highlight.js library -->
+{% endblock %}
+
+
+{% block main %}
+
+    <article class="main flex-item contents-container">
+        <div class="object-container mt-10">
+            <div class="upper">
+                <input type="hidden" id="article_id" name="article_id" value="{{ article.id }}">
+                <div class="uk-flex uk-flex-right articleUpdateBTN-container">
+                    {% if current_user.id == article.author_id %}
+                        <div>
+                            <p class="uk-text-right"><a href="/views/articles/article/update/{{ article.id }}">수정</a></p>
+                        </div>
+                        <div>
+                            <p class="uk-text-right"><a href="#" id="articleDeleteBtn">삭제</a></p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <h3 class="uk-heading-divider">제목: {{ article.title }}</h3>
+                <div class="uk-margin" uk-grid>
+                    <div class="uk-width-1-2">
+                        {% if article.img_path %}
+                            <img src="{{ MEDIA_URL }}/{{ article.img_path }}" style="width: 100%" alt="Article Image">
+                        {% else %}
+                            <img src="{{ MEDIA_URL }}/default/blog_default.png" style="width: 100%" alt="Article Image">
+                        {% endif %}
+                    </div>
+                    <div class="uk-width-1-2">대표 이미지</div>
+                </div>
+
+
+                <p class="uk-text-right">{{ article.created_at | to_kst }}</p>
+                <p class="uk-text-right">{{ article.author.username }}</p>
+            </div>
+
+            <div class="lower">
+                <div id="object-content" class="ql-editor object-content article content">{{ article.content | safe }}</div>
+            </div>
+
+            <script>
+            </script>
+
+            <input id="commentMarkID" type="hidden" name="comment_mark_id" value="{{ mark_id }}">
+        </div>
+        <div class="object-container commentBTN-container mt-10">
+            {% if current_user and current_user.id != article.author.id %}
+                <div id="article-vote" class="vote" data-comment-id="{{ article.id }}">
+                    <span class="uk-badge" id="article-vote-count">{{ article.voter | length | num_format }}</span>
+                    <span id="article-vote-heart" uk-icon="heart"></span>
+                    {% if current_user in article.voter %}
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                console.log(document.getElementById('article-vote-heart'));
+                                document.getElementById('article-vote-heart').querySelector('svg path').style.stroke = '#c23616';
+                                document.getElementById('article-vote-heart').querySelector("svg path").style.fill = '#c23616';
+                            });
+                        </script>
+                    {% else %}
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                document.getElementById('article-vote-heart').querySelector('svg path').style.stroke = '';
+                                document.getElementById('article-vote-heart').querySelector('svg path').style.fill = '';
+                            });
+                        </script>
+                    {% endif %}
+                </div>
+                <div id="commentBTN">질문이나 댓글 달기</div>
+            {% elif current_user and current_user.id == article.author.id %}
+                <div class="not-vote">
+                    <span class="uk-badge">{{ article.voter | length | num_format }}</span>
+                    <span uk-icon="heart"></span>
+                </div>
+                <div id="commentBTN">질문이나 댓글 달기</div>
+            {% else %}
+                <div class="not-vote">
+                    <span class="uk-badge">{{ article.voter | length | num_format }}</span>
+                    <span uk-icon="heart"></span>
+                </div>
+            {% endif %}
+        </div>
+        {% if current_user %}
+            <div class="object-container mt-10" id="commentContainer" >
+                <!--js를 이용해 동적으로 코멘트용 editor를 붙인다.-->
+            </div>
+        {% endif %}
+
+        <div class="object-container">
+            {% if article.articlecomments_all | length > 0 %}
+                <h4 class="mt-20"><strong>질문 및 댓글이 {{ article.articlecomments_all | length | num_format }}개 입니다.</strong></h4>
+            {% else %}
+                <h4 class="mt-20"><strong>아직 질문이나 댓글이 없습니다.</strong></h4>
+            {% endif %}
+            <hr>
+            {% for comment in article.articlecomments_all | sort(attribute='created_at', reverse = True) %}
+                {% if not comment.paired_comment_id %}
+                    <div class="comment-box-container" data-comment-id="{{ comment.id }}">
+                        <div class="comment-box">
+                            {% if current_user.id == comment.author_id %}
+                                <div class="commentUpdateBTN-container">
+                                    <div class="commentUpdateBTN"
+                                         data-comment-id="{{ comment.id }}"
+                                         data-comment-content="{{ (comment.content if comment else '') }}">수정
+                                    </div>
+                                    <div class="commentDeleteBTN" data-comment-id="{{ comment.id }}">
+                                        삭제
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {#                            <div>paired_comment_id: {{ comment.paired_comment_id }}</div>#}
+                            {#                            <div>id: {{ comment.id }}</div>#}
+                            <div class="object-info">
+                                <div class="username">{{ comment.author.username }}</div>
+                                <div class="created-at">{{ comment.created_at | to_kst }}</div>
+                            </div>
+
+                            <div id="comment-object" class="ql-editor object-content comment content">{{ comment.content | safe }}</div>
+                            <div class="replyBTN-container">
+                                {% if current_user and current_user.id != comment.author.id %}
+
+                                    <div id="comment-vote" class="vote" data-comment-id="{{ comment.id }}">
+
+                                        <span class="uk-badge" id="comment-vote-count">{{ comment.voter | length | num_format }}</span>
+                                        <span id="comment-vote-heart" uk-icon="heart"></span>
+                                        {% if current_user in comment.voter %}
+                                            <script>
+                                                document.addEventListener('DOMContentLoaded', function () {
+                                                });
+                                                document.getElementById('comment-vote-heart').querySelector('svg path').style.stroke = '#c23616';
+                                                document.getElementById('comment-vote-heart').querySelector('svg path').style.fill = '#c23616';
+                                            </script>
+                                        {% else %}
+                                            <script>
+                                                document.addEventListener('DOMContentLoaded', function () {
+                                                });
+                                                document.getElementById('comment-vote-heart').querySelector('svg path').style.stroke = '';
+                                                document.getElementById('comment-vote-heart').querySelector('svg path').style.fill = '';
+                                            </script>
+                                        {% endif %}
+                                    </div>
+                                    <div class="replyBTN" data-comment-id="{{ comment.id }}">답글 달기</div>
+                                {% elif current_user and current_user.id == comment.author.id %}
+                                    <div class="not-vote">
+                                        <span class="uk-badge">{{ comment.voter | length | num_format }}</span>
+                                        <span uk-icon="heart"></span>
+                                    </div>
+                                    <div class="replyBTN" data-comment-id="{{ comment.id }}">답글 달기</div>
+                                {% else %}
+                                    <div class="not-vote">
+                                        <span class="uk-badge">{{ comment.voter | length | num_format }}</span>
+                                        <span uk-icon="heart"></span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if current_user %}
+                            <div class="updateReplyContainer mt-10">
+                                <!--js를 이용해 동적으로 답글용 commentUpdate용 editor 및 Reply용 editor를 붙인다.-->
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {% for reply in reply_objs | sort(attribute='created_at', reverse = True) %}
+                        {% if reply.paired_comment_id == comment.id %}
+                            <div class="reply-box-container"
+                                 data-comment-id="{{ reply.id }}"
+                                 data-paired_comment-id="{{ reply.paired_comment_id }}">
+                                <div class="reply-box">
+                                    {% if current_user.id == reply.author_id %}
+                                        <div class="replyUpdateBTN-container">
+                                            <div class="replyUpdateBTN"
+                                                 data-comment-id="{{ reply.id }}"
+                                                 data-paired_comment-id="{{ reply.paired_comment_id }}"
+                                                 data-comment-content="{{ (reply.content if reply else '') }}">수정
+                                            </div>
+                                            <div class="replyDeleteBTN" data-comment-id="{{ reply.id }}">
+                                                삭제
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    {#                                    <div>paired_comment_id: {{ reply.paired_comment_id }}</div>#}
+                                    {#                                    <div>reply(comment).id: {{ reply.id }}</div>#}
+                                    <div class="object-info">
+                                        <div class="username">{{ reply.author.username }}</div>
+                                        <div class="created-at">{{ reply.created_at }}</div>
+                                    </div>
+                                    <div class="ql-editor object-content reply content">{{ reply.content | safe }}</div>
+                                    <div class="replyBTN-container">
+                                        {% if current_user and current_user.id != reply.author.id %}
+                                            <div id="reply-vote" class="vote" data-comment-id="{{ reply.id }}">
+                                                {% for voter in reply.voter %} {{ voter.username }} {% endfor %}
+                                                <span class="uk-badge" id="reply-vote-count">{{ reply.voter | length | num_format }}</span>
+                                                <span id="reply-vote-heart" uk-icon="heart"></span>
+                                                {% if current_user in reply.voter %}
+                                                    <script>
+                                                        document.addEventListener('DOMContentLoaded', function () {
+                                                        });
+                                                        document.getElementById('reply-vote-heart').querySelector('svg path').style.stroke = '#c23616';
+                                                        document.getElementById('reply-vote-heart').querySelector('svg path').style.fill = '#c23616';
+                                                    </script>
+                                                {% else %}
+                                                    <script>
+                                                        document.addEventListener('DOMContentLoaded', function () {
+                                                        });
+                                                        document.getElementById('reply-vote-heart').querySelector('svg path').style.stroke = '';
+                                                        document.getElementById('reply-vote-heart').querySelector('svg path').style.fill = '';
+                                                    </script>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            <div class="not-vote">
+                                                <span class="uk-badge">{{ reply.voter | length | num_format }}</span>
+                                                <span uk-icon="heart"></span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% if current_user and current_user.id == reply.author.id %}
+                                    <div class="replyUpdateContainer mt-10">
+                                        <!--js를 이용해 동적으로 답글용 replyUpdate용 editor를 붙인다.-->
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {#            <script src="{{ STATIC_URL }}/test.js"></script>#}
+
+        <script src="{{ STATIC_URL }}/quills/v_2.0.3/quill.js"></script>
+        <!-- Quill 2 호환 ImageResize 모듈(예: quill-image-resize-module-v2 UMD 번들)
+        https://github.com/henriqueformiga/quill-image-resize-module-v2/tree/master -->
+        <script src="{{ STATIC_URL }}/quills/v_2.0.3/quill-image-resize-module-v2/image-resize.min.js"></script>
+
+        {% if current_user %}
+            <script type="module" src="{{ STATIC_URL }}/quills/custom/articles/comment.js"></script>
+            <script type="module" src="{{ STATIC_URL }}/quills/custom/articles/reply.js"></script>
+
+            <script type="module" src="{{ STATIC_URL }}/quills/custom/articles/commentDelete.js"></script>
+            <script type="module" src="{{ STATIC_URL }}/quills/custom/articles/replyDelete.js"></script>
+
+            <script type="module" src="{{ STATIC_URL }}/statics/js/custom/articles/vote.js"></script>
+        {% endif %}
+
+
+        {% if current_user.id == article.author_id %}
+            <script type="module" src="{{ STATIC_URL }}/quills/custom/articles/articleDelete.js"></script>
+        {% endif %}
+        <script src="{{ STATIC_URL }}/statics/js/custom/articles/detailDisplay.js"></script>
+
+    </article>
+{% endblock %}

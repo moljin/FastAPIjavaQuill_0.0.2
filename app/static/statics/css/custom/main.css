@@ -1,0 +1,51 @@
+.main-with {width: 97%; margin: 0 auto;}
+.width-100 {width: 100%;}
+.clock-container { font-style: italic;
+    width: 97%;
+    margin: 10px auto 0;
+    text-align: right;
+    font-size: 20px;}
+header .header-container {display: flex; width:98.5%; margin-top:5px;}
+.header-image img {width:70px; height: 70px}
+.header-hr1 {margin-top:5px; margin-bottom:2px; height: 2px;  background: grey;}
+.header-hr2 {margin-top:1px !important; margin-bottom: 0 !important; background: grey; height: 1px;}
+.header-hr3 {height: 2px; background: grey;}
+.header-hr4 {margin-top:3px !important; margin-bottom:10px !important; background: grey; height: 1px;}
+.header-hr5 {margin-top:10px !important; margin-bottom:3px !important; background: grey; height: 1px;}
+.header-hr6 {height: 2px; background: grey; margin-bottom: 10px !important;}
+
+.logo-container {display: flex; justify-content: space-evenly; height: 67px;}
+.logo-container .right {width: 5%;}
+.logo {position: relative; left: -20px; text-align: center; margin-top:px; padding: 10px 0; font-size: 50px; font-weight: 900;}
+.logo a {color: #485460;}
+.logo-container .left {width: 5%;}
+
+.menu-container {width: 100%;}
+.menu {text-align: center; width: 80% !important;}
+.menu .item {display: flex; justify-content: space-around; gap: 10px; font-size: 18px;}
+
+footer .contents {text-align: center; font-size: 18px; color: #636e72;}
+footer .footer {padding-bottom: 15px}
+footer hr {margin-top: 10px; margin-bottom: 10px; height: 1px; background: #636e72;}
+
+.section-container.flex {display: flex; flex-wrap: wrap; /* 반응형을 위해 추가 */}
+.section-container.flex .rt-container,
+.section-container.flex .lt-container{width: 15%;}
+.section-container.flex .contents-container {width: 70%;}
+.section-container.flex .contents-container .object-container {padding: 0 12px;}
+.section-container.flex .rt-container div.side-item {margin: 10px 0 10px 10px; border: 1px solid #636e72;}
+.section-container.flex .lt-container div.side-item {margin: 10px 10px 10px 0; border: 1px solid #636e72;}
+.section-container.flex .rt-container div.side-item .inner {background-color: #f5f6fa; padding: 10px}
+.section-container.flex .lt-container div.side-item .inner {background-color: #f5f6fa; padding: 10px}
+
+@media (max-width: 1130px) {
+    .main-with {width: 96%;}
+    .section-container.flex {flex-direction: column; /* 블록들을 세로로 쌓음 */}
+    .section-container.flex .contents-container {order: 1; /* 가운데 블록이 제일 위로 */ width: 100%;}
+    .section-container.flex .lt-container {order: 2; /* 우측 블록이 두 번째로 */width: 100%;}
+    .section-container.flex .rt-container {order: 3; /* 좌측 블록이 제일 아래로 */width: 100%;}
+    .section-container.flex .rt-container div.side-item {margin: 10px 0;}
+    .section-container.flex .lt-container div.side-item {margin: 10px 0;}
+}
+@media (max-width: 700px) {.main-with {width: 95%;}}
+@media (max-width: 550px) {.main-with {width: 93%;}}

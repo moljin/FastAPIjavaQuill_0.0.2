@@ -1,0 +1,81 @@
+/*article detail part*/
+.articleUpdateBTN-container {gap: 20px}
+.articleUpdateBTN-container p {margin: 0;}
+
+
+/*comment creat part*/
+.commentBTN-container {display: flex; justify-content: right; gap: 30px;}
+
+#commentBTN {cursor: pointer; color: #341f97;}
+
+#commentBTN:hover {color: #b33939;}
+
+.cancel-submit {
+    display: flex;
+    justify-content: right;
+    gap: 30px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-top: none;
+    align-items: center;
+    height: 20px;
+}
+
+.cancel-submit .cancel {cursor: pointer;}
+
+.cancel-submit .cancel:hover {color: #b33939;}
+
+.cancel-submit button {
+    width: auto;
+    background-color: #fff;
+    color: #000;
+    font-size: 16px;
+    font-weight: 400;
+    height: auto !important;
+}
+
+.cancel-submit button:hover {
+    background-color: #fff;
+    color: #b33939;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+/*comment and reply display part*/
+.commentUpdateBTN-container,
+.replyUpdateBTN-container {display: flex; gap: 20px; justify-content: right;}
+
+.comment-box {border: 1px solid #ccc; border-radius: 5px; background-color: #ecf0f1; padding: 10px; margin: 10px 0;}
+.reply-box {width: 90%; border: 1px solid #ccc; border-radius: 5px; background-color: #f5f6fa; padding: 10px; margin: 10px 0;}
+.reply-box-container {display: flex; justify-content: right;}
+.replyUpdateContainer {display:none; width: 90%;}
+
+.comment-box-container .object-info,
+.reply-box-container .object-info {text-align: right;}
+
+.comment-box p, .reply-box p {margin: 0;}
+.commentUpdateBTN, .commentDeleteBTN,
+.replyUpdateBTN, .replyDeleteBTN {cursor: pointer; color: #341f97;}
+.commentUpdateBTN:hover, .commentDeleteBTN:hover,
+.replyUpdateBTN:hover, .replyDeleteBTN:hover {color: #b33939;}
+
+@media (max-width: 600px) {
+    .reply-box {width: 85%;}
+}
+@media (max-width: 465px) {
+    .replyUpdateContainer.mt-10 {width: 98%;}
+}
+
+/*comment에 대한 reply create part*/
+.replyBTN-container {display: flex; justify-content: right; gap: 30px;}
+.replyBTN {cursor: pointer; color: #341f97;}
+.replyBTN:hover {color: #b33939;}
+
+.vote {display: flex; gap: 5px; align-items: center; cursor: pointer;}
+.not-vote {display: flex; gap: 5px; align-items: center;}
+.vote .uk-badge,
+.not-vote .uk-badge {margin-top: 2px; background-color: #006266; padding-bottom: 2px}
+
+/*#article-vote svg path,*/
+/*#comment-vote svg path,*/
+/*#reply-vote svg path {stroke: #c23616 !important; fill: #c23616}*/

@@ -1,0 +1,34 @@
+/*detail페이지에서 quill.snow.css 이외의
+quill 에디터 안에 있던 내용물들에 적용하는 css*/
+
+.ql-editor {
+    color: #1e272e;
+    line-height: 1.75rem;
+}
+
+/* Quill 편집기 안의 동영상(iframe/video)을 반응형 16:9로 */
+.ql-editor .ql-video,
+.ql-editor video.ql-video {
+    width: 100% !important;
+    max-width: 100%;
+    height: auto !important;
+    aspect-ratio: 16 / 9;
+    display: block;
+    background: #000; /* 로딩 전 블랙 레터박스 */
+    margin: 20px 0;
+}
+
+/* Quill 편집기 안의 코드 블록을 그대로 유지 */
+.ql-editor .ql-code-block-container {
+    background-color: #1e272e;
+    color: #f8f8f2;
+    overflow: visible;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+/*코드 블록 highlight 유지 & 코드 종류 select 숨김*/
+.object-content .ql-code-block-container select.ql-ui {display: none;}
+.object-container .reply-box-container .ql-editor {height: auto;}

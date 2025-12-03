@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block sub_css %}
+    <style>
+        .title {
+            color: #2d3436;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        .no-bullets, .no-numbers {
+            list-style-type: none;
+        }
+
+        .indents {
+            margin-left: 20px;
+        }
+
+
+    </style>
+{% endblock %}
+
+{% block main %}
+    <article class="main flex-item contents-container" xmlns="http://www.w3.org/1999/html">
+        <div class="mt-10">
+            <div class="object-container">
+                <h2 class="title"><strong>{{ message }} !!</strong></h2>
+                <ol>
+                    <li>사용된 Tool & 기술
+                        <ul>
+                            <li>Restful API 프레임워크: FastAPI
+                                <p>-. 백엔드 API용으로 사용(POST/PATCH/PUT/DELETE Method):</p>
+                                <p class="indents">JSONResponse 혹은 response_model을 이용하여 Pydantic model을 반환함</p>
+                                <p>-. 프론트엔드 API용으로 사용(GET Method)</p>
+                                <p class="indents">templates.TemplateResponse를 이용하여, json data를 담아서 렌더링</p>
+                            </li>
+                            <li>프론트엔드 구성은 Jinja Template과 Vanilla JavaScript를 사용
+                                <p>-. 백엔드로 요청을 보내는 경우 바닐라 자바스크립트를 이용함</p>
+                                <p>-. 백엔드에서 넘어온 json data를 받아서 Jinja syntax와 javascript로 렌더링 함</p>
+                            </li>
+                        </ul>
+                        <br>
+                    </li>
+                    <li>DB는 MySQL, Session관리를 위해 Redis를 사용함
+                        <ul>
+                            <li>
+                                <pre>
+ASYNC_ENGINE = create_async_engine(DATABASE_URL,
+echo=CONFIG.DEBUG,
+future=True,
+pool_size=10, max_overflow=0, pool_recycle=300,  # 5분마다 연결 재활용
+# encoding="utf-8"
+)
+
+# 세션 로컬 클래스 생성
+AsyncSessionLocal = async_sessionmaker(
+    ASYNC_ENGINE,
+    class_=AsyncSession,  # add
+    expire_on_commit=False,
+    autocommit=False,
+    autoflush=False,
+    # poolclass=NullPool,  # SQLite에서는 NullPool 권장
+)                                </pre>
+                            </li>
+                            <li>
+                                <pre>
+redis_pool = ConnectionPool(
+    host=host,
+    port=port,
+    db=db,
+    password=password,
+    decode_responses=True,  # 문자열 응답을 자동으로 디코딩
+    max_connections=10)
+
+redis_client = Redis(connection_pool=redis_pool)</pre>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>모델: User, Article, ArticleComment, LottoNum
+                        <ul>
+                            <li>각 모델들에 구현된 내용
+                                <p>-. user 가입/업데이트/탈퇴</p>
+                                <p>-. article(게시글) 생성/수정/삭제</p>
+                                <p>-. article(게시글)의 목록의 페이지네이션(오프셋 모드, 커서모드)</p>
+                                <p>-. article(게시글), 코멘트(댓글)의 검색기능</p>
+                                <p>-. article(게시글), 코멘트(댓글)의 "좋아요(vote)"기능</p>
+                                <p>-. 로또: 과거의 당첨번호 데이타 업데이트(1주일마다 자동)</p>
+                                <p>-. 로또 번호 최상위 당첨번호 갯수 선택 후 예측 당첨번호 맞추기</p>
+                            </li>
+                            <li>구현 과정중 특별히 어려웠던 부분들
+                                <p>-. user 가입/이메일변경/비밀번호 분실시 재설정 과정에 본인인증을 이메일로 인증코드 발송 후 확인하는 과정을 거침</p>
+                                <p>-. user 로그인시 액세스 토큰으로 Authorization을 획득하고,</p>
+                                <p class="indents">액세스 토큰 만료시 리프레시 토큰으로 액세스토큰을 재발급하는 과정을 넣음</p>
+                                <p>-. article(게시글)의 내용을 Quill.js 에디터를 사용함(Quill.js 에디터의 커스터마이징)</p>
+                                <p>-. article(게시글)에 저장되었던 이미지나 동영상중에서 사용하지 않는 것들을 정리하는 로직 추가 함</p>
+                                <p>-. article(게시글)의 목록 페이지네이션(오프셋 모드와 커서모드)를 검색기능과 연결하여 구현하는 것이 난이도가 매우 높았슴</p>
+                                <p>-. article(게시글)의 댓글과 대댓글을 하나의 모델(ArticleComment)을 사용하여 구현함: </p>
+                                <p class="indents">댓글과 대댓글 모델을 각각 두는 방법도 고려할 필요 있슴</p>
+                                <p>-. article(게시글)의 좋아요(vote)기능을 구현할 때,</p>
+                                <p class="indents">"Association Table(Join Table)을 이용함"</p>
+                                <p class="indents">many to many ORM을 Model Class table로 구현하지 않음(이것의 사용을 고려할 필요가 있슴)</p>
+                                <p>-. 당첨 로또 번호의 최상위 번호 10개를 업데이트하는 과정을 자동으로 1주일마다 실행할 수 있게 Scheduler를 적용함</p>
+                            </li>
+                        </ul>
+                    </li>
+                </ol>
+                <!--
+                <ul>
+                    <li>HTML</li>
+                    <li>CSS</li>
+                    <li>JavaScript</li>
+                </ul>
+
+                <ul class="no-bullets">
+                    <li>a. HTML</li>
+                    <li>b. CSS</li>
+                    <li>c. JavaScript</li>
+                </ul>
+
+                <ol>
+                    <li>HTML</li>
+                    <li>CSS</li>
+                    <li>JavaScript</li>
+                </ol>
+
+                <ol class="no-numbers">
+                    <li>HTML</li>
+                    <li>CSS</li>
+                    <li>JavaScript</li>
+                </ol>
+
+                <ul>
+                                    <li>항목 1</li>
+                                    <li>항목 2
+                                        <ul>
+                                            <li>하위 항목 2-1</li>
+                                            <li>하위 항목 2-2</li>
+                                        </ul>
+                                    </li>
+                                    <li>항목 3</li>
+                                </ul>
+                -->
+
+            </div>
+        </div>
+
+
+    </article>
+{% endblock %}
