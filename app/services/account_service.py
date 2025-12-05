@@ -62,7 +62,6 @@ class UserService:
 
     async def update_email(self, old_email: EmailStr, email: EmailStr):
         user = await self.get_user_by_email(old_email)
-        print("user", user)
         if user is None:
             return None
         user.email = str(email)

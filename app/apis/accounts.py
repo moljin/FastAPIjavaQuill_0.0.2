@@ -41,7 +41,6 @@ async def authcode_request_email(payload: EmailRequest,
                                  ):
     email = str(payload.email).lower().strip()
     _type = payload.type
-    print("_type: ", _type)
     existed_email_user = await _user_service.get_user_by_email(payload.email)
     if _type == "register":
         if existed_email_user:
@@ -85,8 +84,6 @@ async def authcode_request_email(payload: EmailRequest,
     code_key = f"verify:{email}"
     await redis_client.set(code_key, authcode, ex=CODE_TTL_SECONDS)  # Redis에 인증코드 저장하고 TTL 설정 (10분)
     await redis_client.set(recent_key, "1", ex=30)  # 최근 요청 키(예: 30초 내 재요청 방지) - 선택
-
-    print("await redis_client.get(code_key): ", await redis_client.get(code_key))
 
     title = None
     if _type == "register":
@@ -198,7 +195,6 @@ async def register_user(username: str = Form(...),
         username(닉네임), 비밀번호는 js단에서 빈값 및 validation을 처리한다. 이미지는 없어도 들어온다.
         이미지등의 파일을 받는 경우는 pydantic schema로 검증이 안된다. formData로 받아서 검증해야 한다.
         하지만, 이미지등의 파일이 없는 경우는 json으로 받아서 pydantic schema로 검증할 수 있고, 그렇게 하는 것을 권장한다."""
-    print("In register_user: ", username, email, token, password, imagefile)
     verified_key = f"verified:{email}"
     session_key = f"user:{email}"
     verified_token = await redis_client.get(verified_key)
@@ -264,13 +260,11 @@ async def lost_password_resetting(lost_password_in: UserLostPasswordIn,
                                   _user_service: UserService = Depends(get_user_service)):
     email = str(lost_password_in.email).lower().strip()
     token = lost_password_in.token
-    print("token: ", token)
     newpassword = lost_password_in.newpassword
 
     verified_key = f"verified:{email}"
     session_key = f"user:{email}"
     verified_token = await redis_client.get(verified_key)
-    print("verified_token: ", verified_token)
     session_data = await redis_client.hgetall(session_key)
 
     if not verified_token:  # email이 빈칸이어도 여기로 오지만, CustomError 발생시킨다.
@@ -324,8 +318,6 @@ async def login(response: Response, request: Request,
 
     # 요청 정보로 HTTPS 여부 판별 (프록시가 있다면 x-forwarded-proto 우선)
     attrs = compute_cookie_attrs(request, cross_site=False)
-    print("1. attrs['secure']: ", attrs["secure"])
-    print("2. attrs['samesite']: ", attrs["samesite"])
     _REFRESH_COOKIE_EXPIRE = refresh_expire()
 
     response.set_cookie(
@@ -410,8 +402,6 @@ async def update_user(user_id: int,
         return updated_user
 
     except ValidationError as e:
-        print("except ValidationError as e:", e.errors())
-        print("except ValidationError as e.errors():", e.errors()[0]["loc"][0])
         # 요청 본문에 대한 자동 422 변환이 아닌, 수동으로 422로 변환해 주는 것이 좋습니다.
         if email is not None and e.errors()[0]["loc"][0] == "email":
             raise CustomErrorException(status_code=432, detail="이메일 형식 부적합")
@@ -563,10 +553,5 @@ async def delete_user(user_id: int,
         await redis_client.delete(f"{REFRESH_TOKEN_PREFIX}{user_id}")
 
     request.state.skip_set_cookie = True
-    print("Final headers:", resp.headers.getlist("set-cookie"))
-
-    print("쿠키 삭제 확인 request.cookies.get(ACCESS_COOKIE_NAME): ", request.cookies.get(CONFIG.ACCESS_COOKIE_NAME))
-    print("쿠키 삭제 확인 request.cookies.get(REFRESH_COOKIE_NAME): ", request.cookies.get(CONFIG.REFRESH_COOKIE_NAME))
-    print("response.raw_headers: ", resp.raw_headers)
 
     return resp

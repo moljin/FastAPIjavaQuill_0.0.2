@@ -34,7 +34,6 @@ def optimal_password(password: str):
     password_reg = r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*?_=+-])[A-Za-z\d!@#$%^&*?_=+-]{9,50}$"
     regex = re.compile(password_reg)
     password_optimal = re.search(regex, str(password))
-    print("password_optimal: password : ", password)
 
     if not password_optimal:
         from app.utils.exc_handler import CustomErrorException

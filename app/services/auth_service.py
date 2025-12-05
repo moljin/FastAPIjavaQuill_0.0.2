@@ -25,8 +25,6 @@ class AuthService:
 
     async def authenticate_user(self, login_data: LoginRequest):
         # 사용자 조회
-        print("login_data: ", login_data)
-        print("login_data.email: ", login_data.email)
         if not login_data.email or not login_data.password:
             raise CustomErrorException(status_code=410,
                                    detail="인증 실패: 빈칸을 채워주세요.",
@@ -38,11 +36,6 @@ class AuthService:
         )
         result = await self.db.execute(query)
         user = result.scalar_one_or_none()
-        print("user: ", user)
-        print("user.email: ", user.email)
-        print("login_data.email: ", login_data.email)
-        print("login_data.password: ", login_data.password)
-        print("user.password: ", user.password)
 
         if not user:
             # return None
@@ -60,9 +53,6 @@ class AuthService:
             raise CustomErrorException(status_code=411,
                                    detail="인증 실패: 비밀번호가 일치하지 않습니다.",
                                    headers={"WWW-Authenticate": "Bearer"})
-
-
-        print("user: ", user)
         return user
 
     """
@@ -133,7 +123,6 @@ class AuthService:
     """
 
     async def refresh_access_token(self, refresh_token: str):
-        print("refresh_access_token 리프레시 토큰으로 액세스 토큰 생성 시작: refresh_token: ", refresh_token)
         # 리프레시 토큰 검증
         payload = verify_token(refresh_token)
         if not payload:

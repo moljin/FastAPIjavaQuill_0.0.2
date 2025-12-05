@@ -3,8 +3,6 @@ from typing import Optional
 from fastapi import Request, APIRouter, Depends, Form
 import random
 import ast
-import numpy as np
-import pandas as pd
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -130,7 +128,6 @@ async def top10_lotto(request: Request,
                       current_user: Optional[User] = Depends(get_optional_current_user)):
     old_latest = await latest_lotto(db)
     if num:
-        print("num: ", num)
         lotto_num_list = ast.literal_eval(old_latest.lotto_num_list)
         latest_round_num = old_latest.latest_round_num
         wanted_top_list, lotto_random_num = await extract_frequent_num(lotto_num_list, int(num))
@@ -215,8 +212,6 @@ async def lotto_top10_post(request: Request,
                            db: AsyncSession = Depends(get_db),
                            admin_user = Depends(allow_usernames(ADMINS))
                            ):
-    print("admin_user: ", admin_user.username)
-    print(f"latest_round: {latest_round}")
     old_latest = await latest_lotto(db) # db에 저장된 것
     latest_page = await extract_latest_round() # 로또사이트의 마지막 회차
     if old_latest:

@@ -37,7 +37,7 @@ class AsyncTokenService:
     @classmethod
     async def store_refresh_token(cls, user_id: int, refresh_token: str) -> bool:
         user_key = f"{REFRESH_TOKEN_PREFIX}{user_id}"
-        print("store_refresh_token user_key: ", user_key)
+        print("store_refresh_token user_key: ")
 
         expire_seconds = int(timedelta(days=CONFIG.REFRESH_TOKEN_EXPIRE + 1).total_seconds())
         print("store_refresh_token expire_seconds: ", expire_seconds)

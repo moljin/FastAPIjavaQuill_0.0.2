@@ -59,7 +59,6 @@ def _cookie_attrs_for(request: Request) -> dict:
 
 class AccessTokenSetCookieMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
-        print("AccessTokenSetCookieMiddleware 시작 request.url: ", request.url)
         access_cookie: Optional[str] = request.cookies.get(CONFIG.ACCESS_COOKIE_NAME)
         refresh_cookie: Optional[str] = request.cookies.get(CONFIG.REFRESH_COOKIE_NAME)
 
@@ -73,10 +72,8 @@ class AccessTokenSetCookieMiddleware(BaseHTTPMiddleware):
                     refreshed = await auth_service.refresh_access_token(refresh_cookie)
                     if isinstance(refreshed, dict):
                         new_access = refreshed.get(CONFIG.ACCESS_COOKIE_NAME)
-                        print("1. new_access: ", new_access)
                     elif isinstance(refreshed, str):
                         new_access = refreshed
-                        print("2. new_access: ", new_access)
                 except Exception as e:
                     # 개발 편의를 위해 로그만 남기고, refresh_token은 보존
                     print(f"[AccessTokenSetCookieMiddleware] refresh failed: {e}")
@@ -85,7 +82,6 @@ class AccessTokenSetCookieMiddleware(BaseHTTPMiddleware):
                     print("AccessTokenSetCookieMiddleware 0.2.1 get_db finally: ", db)
                 break
 
-            print("AccessTokenSetCookieMiddleware new_access: ", new_access)
             # 2) 첫 요청부터 인증이 통과되도록 Authorization 헤더 주입
             if new_access:
                 try:
@@ -102,7 +98,6 @@ class AccessTokenSetCookieMiddleware(BaseHTTPMiddleware):
         # 4) 응답에 access_token 쿠키 설정(첫 응답부터 브라우저 저장)
         if new_access:
             attrs = _cookie_attrs_for(request)
-            print("AccessTokenSetCookieMiddleware attrs: ", attrs)
             response.set_cookie(
                 key=CONFIG.ACCESS_COOKIE_NAME,
                 value=new_access,
@@ -113,7 +108,6 @@ class AccessTokenSetCookieMiddleware(BaseHTTPMiddleware):
             # 필요 시 아래 주석을 풀어 access_token만 정리할 수 있습니다.
             # response.delete_cookie(ACCESS_COOKIE_NAME, path="/")
             pass
-        print("AccessTokenSetCookieMiddleware 끝 request.cookies.get(ACCESS_COOKIE_NAME): ", request.cookies.get(CONFIG.ACCESS_COOKIE_NAME))
         return response
 
 

@@ -15,8 +15,6 @@ class ArticleCommentService:
 
     async def create_comment(self, article: Article, comment_in: CommentIn, user: User):
         create_comment = ArticleComment(**comment_in.model_dump())
-        print("comment_in.paired_comment_id", comment_in.paired_comment_id)
-        print("create_comment", create_comment)
         create_comment.article_id = article.id
         create_comment.author_id = user.id
 
@@ -66,7 +64,6 @@ class ArticleCommentService:
             return None
         if comment.author_id == user.id:
             # (에러 반환으로 수정하자))
-            print("comment.author_id == user.id")
             return False
 
         # 2) 이미 투표했는지 확인
@@ -74,11 +71,8 @@ class ArticleCommentService:
                 and_(articlecomment_voter.c.articlecomment_id == comment_id,
                      articlecomment_voter.c.user_id == user.id)
             )
-        print("1. comment vote query", query)
         result = await self.db.execute(query)
-        print("2. comment vote query", result)
         exists = result.scalar_one_or_none()
-        print("3.comment vote query", exists)
         if exists is not None:
             # 이미 투표했다면 아무 것도 하지 않음(또는 에러 반환으로 수정하자)
             # return None
@@ -91,8 +85,6 @@ class ArticleCommentService:
             )
             await self.db.commit()
             await self.db.refresh(comment) # comment를 refresh해도 적용된다. 좋아요 테이블은 객체가 않이라서...
-            print("4. exists id: ", exists)
-            print("5. vote delete post: " , comment.voter_count)
             # return None
             return { "result": "delete", "voter_count": comment.voter_count}
 
@@ -116,7 +108,6 @@ class ArticleCommentService:
         print("투표 콜: 새로 추가 후 해당 Comment의 좋아요 갯수: ", count) 
         model에 함수로 넣었다."""
 
-        print("6. vote add post", comment.voter_count)
         # return True
         return { "result": "insert", "voter_count": comment.voter_count}
 

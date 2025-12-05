@@ -68,7 +68,6 @@ async def extract_latest_round():
 
     selected_soup = BeautifulSoup(f"""{list_select}""", 'lxml')
     latest_round = selected_soup.find_all('option', selected=True)[0].get_text()
-    print("마지막 회차:: ", int(latest_round))
 
     select_html = etree.HTML(f"""{list_select}""")
     selected = select_html.xpath('//option[@selected]')
@@ -101,13 +100,10 @@ async def extract_frequent_num(_list: list, num: int):
     
     # num개 추출한 것 리스트로 만들기
     wanted_top_list = wanted_top.index.tolist()
-    print("wanted_top_list:", wanted_top_list)
-    print("len(wanted_top_list):", len(wanted_top_list))
 
     # random.sample 표본 크기도 안전하게 제한 (최대 6)
     sample_size = min(6, len(wanted_top_list))
     lotto_random_num = sorted(random.sample(wanted_top_list, sample_size))
-    print("lotto_random_num:", lotto_random_num)
 
     return wanted_top_list, lotto_random_num
 

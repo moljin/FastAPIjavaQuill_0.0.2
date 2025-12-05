@@ -40,9 +40,6 @@ MEDIA_DIR = os.path.join(APP_DIR, 'media')
 ADMINS = [os.getenv("ADMIN_1"), os.getenv("ADMIN_2")]
 LOTTO_LATEST_URL = os.getenv("LOTTO_LATEST_URL")
 LOTTO_FILEPATH = os.path.join(MEDIA_DIR, os.getenv("LOTTO_FILEPATH"))
-print("LOTTO_FILEPATH: ", LOTTO_FILEPATH)
-print("LOTTO_LATEST_URL: ", LOTTO_LATEST_URL)
-print("ADMINS: ", ADMINS)
 
 templates = Jinja2Templates(
     directory=TEMPLATE_DIR,

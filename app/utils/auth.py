@@ -37,7 +37,6 @@ async def create_access_token(data: dict, expires_delta: Optional[timedelta] = N
                                           to_encode,
                                           CONFIG.SECRET_KEY,
                                           algorithm=CONFIG.ALGORITHM)
-    print("create_access_token ", encoded_jwt)
     return encoded_jwt
 
 
@@ -63,7 +62,6 @@ async def create_refresh_token(data: dict) -> str:
                                           refresh_payload,
                                           CONFIG.SECRET_KEY,
                                           algorithm=CONFIG.ALGORITHM)
-    print("create_refresh_token ", encoded_jwt)
     return encoded_jwt
 
 
@@ -88,7 +86,6 @@ def verify_token(token: str, *, type_: Optional[str] = None) -> Optional[dict[st
 
     try:
         payload = jwt.decode(token, CONFIG.SECRET_KEY, algorithms=[CONFIG.ALGORITHM])
-        print("verify_token payload == :::::", payload)
         if type_ is not None and payload.get("type") != type_:
             # 타입 불일치 시 무효
             return None
@@ -102,7 +99,6 @@ def verify_token(token: str, *, type_: Optional[str] = None) -> Optional[dict[st
 
 async def payload_to_user(access_token: str, db: AsyncSession = Depends(get_db) ):
     payload = verify_token(access_token)
-    print("payload_to_user: payload:::: ", payload)
     if payload is None:
         raise HTTPException(
             status_code=401,

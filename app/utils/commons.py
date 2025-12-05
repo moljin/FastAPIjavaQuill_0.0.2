@@ -111,7 +111,6 @@ async def file_renaming(username:str, ext:str):
 async def upload_single_image(path:str, user: User, imagefile: UploadFile = None):
     try:
         upload_dir = f"{path}"+"/"+f"{user.id}"+"/" # d/t Linux
-        print("upload_dir: ", upload_dir)
         url = await file_write_return_url(upload_dir, user, imagefile, "media", _type="image")
         return url
 
@@ -271,7 +270,6 @@ def create_orm_id(objs_all, user):
     """비동기 함수로 바꿔야 하나???"""
     try:
         unique_num = str(objs_all[0].id + 1)  # 고유해지지만, model.id와 일치하지는 않는다. 삭제된 놈들이 있으면...
-        print("unique_num:::::::::::::: ", unique_num,)
     except Exception as e:
         print("c_orm_id Exception error::::::::: 임의로 1로... 할당  ", e)
         unique_num = str(1) # obj가 첫번째 것인 경우: 임의로 1로... 할당

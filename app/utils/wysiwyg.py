@@ -12,10 +12,8 @@ from app.utils.commons import remove_file_path, remove_empty_dir
 # Quills 유틸: HTML에서 이미지 src 추출
 IMG_SRC_PATTERN = re.compile(r'<img[^>]+src=["\']([^"\']+)["\']', re.IGNORECASE)
 def extract_img_srcs(html: str) -> Set[str]:
-    print("extract_IMG_srcs:::html:::", html)
     if not html:
         return set()
-    print("set(IMG_SRC_PATTERN.findall(html)", set(IMG_SRC_PATTERN.findall(html)))
     return set(IMG_SRC_PATTERN.findall(html))
 
 
@@ -24,10 +22,8 @@ VIDEO_SRC_PATTERN = re.compile(
     re.IGNORECASE | re.DOTALL
 )
 def extract_video_srcs(html: str) -> Set[str]:
-    print("extract_video_srcs:::html:::", html)
     if not html:
         return set()
-    print("set(VIDEO_SRC_PATTERN.findall(html)", set(VIDEO_SRC_PATTERN.findall(html)))
     return set(VIDEO_SRC_PATTERN.findall(html))
 
 
@@ -37,7 +33,6 @@ async def redis_add(srcs: list, key: str):
     if not members:
         return {"marked": [], "added": 0}
     added_count = await redis_client.sadd(key, *members)
-    print("marked: ", srcs, "added_count:::", added_count)
     return added_count
 
 
@@ -47,14 +42,12 @@ async def redis_rem(srcs: list, key: str):
     if not members:
         return {"marked": [], "added": 0}
     removed_count = await redis_client.srem(key, *members)
-    print("marked: ", srcs, "removed_count:::", removed_count)
     return removed_count
 
 
 async def redis_delete_candidates(temp_key: str, real_key: str):
     if await redis_client.exists(temp_key):
-        print("redis_client.exists(temp_img_key) 이미지가 있으면 여기로 들어온다.",
-              await redis_client.exists(temp_key))
+        print("redis_client.exists(temp_img_key) 이미지가 있으면 여기로 들어온다.")
         for url in await redis_client.smembers(temp_key):
             await redis_client.sadd(real_key, url)
         await redis_client.delete(temp_key)

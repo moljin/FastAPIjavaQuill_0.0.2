@@ -28,25 +28,20 @@ async def get_current_user(
 ):
     # 1) 헤더
     auth = request.headers.get("authorization")
-    print("1. get_current_user 시작  ::: auth::::::: ", auth)
     access_token = auth.split(" ", 1)[1].strip() if auth and auth.lower().startswith("bearer ") else None
-    print("2. get_current_user 시작 ::: access_token::::::: ", access_token)
 
     # 2) 쿠키 폴백
     if not access_token:
         access_token = request.cookies.get(CONFIG.ACCESS_COOKIE_NAME)
-    print("3. get_current_user 시작 ::: request.cookies.get access_token::::::: ", access_token)
     if access_token:
         try:
             user = await payload_to_user(access_token, db)
-            print("get_current_user 끝 if access_token: user::::::: ", user)
             return user
         except ExpiredSignatureError:
             pass  # 3) 리프레시 시도
 
     # 3) 리프레시 폴백 (공통 함수 호출)
     refresh_token = request.cookies.get(CONFIG.REFRESH_COOKIE_NAME)
-    print("4. refresh_access_token_from_cookie: refresh_token: ", refresh_token)
     if not refresh_token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
 
@@ -66,8 +61,6 @@ async def get_current_user(
     # request.state에 보관 (뷰에서 꺼내서 실제 TemplateResponse에 심을 수 있게)
     request.state.new_access = new_access
     attrs = compute_cookie_attrs(request, cross_site=False)
-    print("1. attrs['secure']: ", attrs["secure"])
-    print("2. attrs['samesite']: ", attrs["samesite"])
     response.set_cookie(
         key=CONFIG.ACCESS_COOKIE_NAME,
         value=new_access,
@@ -79,8 +72,6 @@ async def get_current_user(
     )
 
     user = await payload_to_user(new_access, db)
-
-    print("get_current_user 끝 refresh_access_token) 리프레시 폴백: user::::::: ", user)
     return user
 
 
