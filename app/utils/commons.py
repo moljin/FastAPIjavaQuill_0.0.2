@@ -6,6 +6,7 @@ import urllib.parse
 import uuid
 from typing import LiteralString
 
+import pytz
 from email_validator import validate_email, EmailNotValidError
 from fastapi import status, UploadFile, HTTPException, Request
 import os
@@ -207,13 +208,17 @@ def is_valid_email(email: str) -> bool:
 def refresh_expire():
     return datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=CONFIG.REFRESH_TOKEN_EXPIRE)
 
-try:
-    from zoneinfo import ZoneInfo  # Python 3.9+
-    KST = ZoneInfo("Asia/Seoul")
-except Exception as e:
-    print("zoneInfo error: ", e)
-    # tzdata가 없을 때를 위한 안전한 폴백(고정 +09:00)
-    KST = datetime.timezone(datetime.timedelta(hours=9), name="KST")
+def get_kst():
+    try:
+        # from zoneinfo import ZoneInfo  # Python 3.9+
+        # KST = ZoneInfo("Asia/Seoul")
+        KST = pytz.timezone('Asia/Seoul')
+    except Exception as e:
+        # print("zoneInfo error: ", e)
+        print("pytz.timezone error: ", e)
+        # tzdata가 없을 때를 위한 안전한 폴백(고정 +09:00)
+        KST = datetime.timezone(datetime.timedelta(hours=9), name="KST")
+    return KST
 
 #
 def get_times():
@@ -222,6 +227,7 @@ def get_times():
     _NOW_TIME_UTC= datetime.datetime.now(datetime.timezone.utc)
 
     # 2) 필요한 지역시간(KST)으로 변환
+    KST = get_kst()
     _NOW_TIME = _NOW_TIME_UTC.astimezone(KST)
     return _NOW_TIME_UTC, _NOW_TIME
 
@@ -250,6 +256,7 @@ def to_kst(dt: datetime.datetime | None, fmt: str = "%Y-%m-%d %H:%M:%S") -> str:
         return ""
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=datetime.timezone.utc)
+    KST = get_kst()
     return dt.astimezone(KST).strftime(fmt)
 
 

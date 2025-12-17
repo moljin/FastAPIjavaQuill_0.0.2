@@ -19,7 +19,7 @@ from app.core.redis import redis_client
 from app.core.settings import STATIC_DIR, MEDIA_DIR, CONFIG, templates
 from app.utils import exc_handler
 from app.utils.apschedulers import scheduler, scheduled_lotto_update
-from app.utils.commons import to_kst, num_format, urlencode_filter
+from app.utils.commons import to_kst, num_format, urlencode_filter, get_kst
 from app.utils.middleware import AccessTokenSetCookieMiddleware
 from app.views import index
 from app.views import accounts as views_accounts
@@ -27,7 +27,7 @@ from app.views import articles as views_articles
 from app.lottos import views as views_lotto
 
 # 한국 시간대 명시적 지정
-KST = pytz.timezone('Asia/Seoul')
+KST = get_kst()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

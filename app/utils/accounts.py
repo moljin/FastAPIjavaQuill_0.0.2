@@ -62,5 +62,5 @@ def is_admin(current_user: User) -> bool:
         else:
             return False
     except Exception as e:
-        print("is_admin False error: ", e, f"==> False")
+        print("If Not login ==> is_admin False error: ", e, f"==> False")
         return False

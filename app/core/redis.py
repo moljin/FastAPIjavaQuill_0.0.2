@@ -27,6 +27,10 @@ redis_pool = ConnectionPool(
     db=db,
     password=password,
     decode_responses=True,  # 문자열 응답을 자동으로 디코딩
-    max_connections=10)
+    max_connections=10,
+    socket_keepalive=True,
+    socket_connect_timeout=5,
+    socket_timeout=5,
+    retry_on_timeout=True,)
 
 redis_client = Redis(connection_pool=redis_pool)
