@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db, ARTICLE_THUMBNAIL_UPLOAD_DIR, ARTICLE_EDITOR_USER_IMG_UPLOAD_DIR, ARTICLE_EDITOR_USER_VIDEO_UPLOAD_DIR
-from app.core.redis import redis_client
+from app.core.redis import get_redis_client
 from app.core.settings import APP_DIR, MEDIA_DIR
 from app.dependencies.auth import get_current_user
 from app.models.articles import ArticleComment

@@ -10,7 +10,7 @@ from pydantic import EmailStr, TypeAdapter, ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db, PROFILE_IMAGE_UPLOAD_URL, ARTICLE_THUMBNAIL_UPLOAD_DIR, ARTICLE_EDITOR_USER_IMG_UPLOAD_DIR, ARTICLE_EDITOR_USER_VIDEO_UPLOAD_DIR
-from app.core.redis import ACCESS_COOKIE_MAX_AGE, redis_client, CODE_TTL_SECONDS
+from app.core.redis import ACCESS_COOKIE_MAX_AGE, get_redis_client, CODE_TTL_SECONDS
 from app.core.settings import CONFIG
 from app.dependencies.auth import get_optional_current_user, get_current_user
 from app.models.users import User
@@ -39,6 +39,7 @@ async def authcode_request_email(payload: EmailRequest,
                                  current_user: Optional[User] = Depends(get_optional_current_user),
                                  _user_service: UserService = Depends(get_user_service),
                                  ):
+    redis_client = get_redis_client()
     email = str(payload.email).lower().strip()
     _type = payload.type
     existed_email_user = await _user_service.get_user_by_email(payload.email)
@@ -127,6 +128,7 @@ async def authcode_verify(payload: VerifyRequest,
     """ 회원 가입시 인증 코드로 본인 확인(단순 인증하기)
     ### 이메일 변경 로직도 여기에 넣었다.(인증과 동시에 이메일 변경)
     javascript 코드도 authVerifyForm.addEventListener('submit' 에서 같은 흐름의 로직을 유지했다."""
+    redis_client = get_redis_client()
     email = str(payload.email).lower().strip()
     authcode = payload.authcode.strip()
     _type = payload.type

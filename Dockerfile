@@ -34,5 +34,11 @@ WORKDIR /home/moljin/FastAPIjavaQuill_0.0.2
 
 # gunicorn -w 9 uvicorn.workers.UvicornWorker main:app
 # gunicorn --bind unix:/tmp/myapi.sock main:app --worker-class uvicorn.workers.UvicornWorker
-#CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-w", "9", "--bind", "unix:/tmp/myapi.sock", "-b", "0.0.0.0:8000", "main:app"]
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-w", "1", "--bind", "unix:/tmp/myapi.sock", "-b", "0.0.0.0:8000", "main:app"]
+
+# workers 9 유지
+# 파이참에서 by Claude Agent로 모두 수정해봄
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-w", "9", "--bind", "unix:/tmp/myapi.sock", "-b", "0.0.0.0:8000", "main:app"]
+
+# workers 1로 변경함. worker를 늘리는 순간 Redis 장애 확률이 기하급수적으로 증가 by Chat GPT
+# 파이참에서 by Claude Agent로 모두 수정해봄
+#CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-w", "1", "--bind", "unix:/tmp/myapi.sock", "-b", "0.0.0.0:8000", "main:app"]

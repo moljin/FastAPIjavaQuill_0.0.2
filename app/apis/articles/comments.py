@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db, ARTICLE_COMMENT_EDITOR_USER_IMG_UPLOAD_DIR, ARTICLE_COMMENT_EDITOR_USER_VIDEO_UPLOAD_DIR
-from app.core.redis import redis_client
+from app.core.redis import get_redis_client
 from app.core.settings import APP_DIR
 from app.dependencies.auth import get_current_user
 from app.models.users import User

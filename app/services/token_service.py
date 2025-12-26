@@ -1,7 +1,7 @@
 from datetime import timedelta
 from typing import Optional
 
-from app.core.redis import redis_client
+from app.core.redis import get_redis_client
 from app.core.settings import CONFIG
 
 TOKEN_BLACKLIST_PREFIX = "blacklist:"  # 토큰 블랙리스트 키 접두사
@@ -16,17 +16,20 @@ class AsyncTokenService:
 
     @classmethod
     async def blacklist_token(cls, token: str, expires_in: int = DEFAULT_TOKEN_EXPIRY) -> bool:
+        redis_client = get_redis_client()
         key = f"{TOKEN_BLACKLIST_PREFIX}{token}"
         await redis_client.set(key, "1", ex=expires_in)
         return True
 
     @classmethod
     async def is_token_blacklisted(cls, token: str) -> bool:
+        redis_client = get_redis_client()
         key = f"{TOKEN_BLACKLIST_PREFIX}{token}"
         return bool(await redis_client.exists(key))
 
     @classmethod
     async def clear_blacklist(cls) -> None:
+        redis_client = get_redis_client()
         # 대량 삭제 최적화: 일괄 수집 후 delete(*keys)
         keys = []
         async for key in redis_client.scan_iter(match=f"{TOKEN_BLACKLIST_PREFIX}*"):
@@ -36,6 +39,7 @@ class AsyncTokenService:
 
     @classmethod
     async def store_refresh_token(cls, user_id: int, refresh_token: str) -> bool:
+        redis_client = get_redis_client()
         user_key = f"{REFRESH_TOKEN_PREFIX}{user_id}"
         print("store_refresh_token user_key: ")
 
@@ -52,11 +56,13 @@ class AsyncTokenService:
 
     @classmethod
     async def validate_refresh_token(cls, user_id: int, refresh_token: str) -> bool:
+        redis_client = get_redis_client()
         user_key = f"{REFRESH_TOKEN_PREFIX}{user_id}"
         return bool(await redis_client.sismember(user_key, refresh_token))
 
     @classmethod
     async def revoke_refresh_token(cls, user_id: int, refresh_token: Optional[str] = None) -> bool:
+        redis_client = get_redis_client()
         user_key = f"{REFRESH_TOKEN_PREFIX}{user_id}"
         if refresh_token:
             await redis_client.srem(user_key, refresh_token)

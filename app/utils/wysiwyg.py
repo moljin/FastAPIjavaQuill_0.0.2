@@ -3,7 +3,7 @@ from typing import Set
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.redis import redis_client
+from app.core.redis import get_redis_client
 from app.core.settings import APP_DIR
 from app.models.articles import Article, ArticleComment
 from app.utils.commons import remove_file_path, remove_empty_dir
@@ -28,6 +28,7 @@ def extract_video_srcs(html: str) -> Set[str]:
 
 
 async def redis_add(srcs: list, key: str):
+    redis_client = get_redis_client()
     # 안전 처리: None/빈 문자열 제거 + 문자열로 캐스팅
     members = [str(src) for src in srcs if src]
     if not members:
@@ -37,6 +38,7 @@ async def redis_add(srcs: list, key: str):
 
 
 async def redis_rem(srcs: list, key: str):
+    redis_client = get_redis_client()
     # 안전 처리: None/빈 문자열 제거 + 문자열로 캐스팅
     members = [str(src) for src in srcs if src]
     if not members:
@@ -46,6 +48,7 @@ async def redis_rem(srcs: list, key: str):
 
 
 async def redis_delete_candidates(temp_key: str, real_key: str):
+    redis_client = get_redis_client()
     if await redis_client.exists(temp_key):
         print("redis_client.exists(temp_img_key) 이미지가 있으면 여기로 들어온다.")
         for url in await redis_client.smembers(temp_key):
@@ -56,6 +59,7 @@ async def redis_delete_candidates(temp_key: str, real_key: str):
 # --- Helpers ---
 ###############################################################################################################
 async def remove_delete_candidates(_type, delete_candidates: set, object_id: int, currents: set, db: AsyncSession, key: str) -> None:
+    redis_client = get_redis_client()
     for url in delete_candidates:
         print("delete_candidates url: ", url)
         if url not in currents and not await is_media_used_elsewhere(_type, object_id, url, db):
@@ -66,6 +70,7 @@ async def remove_delete_candidates(_type, delete_candidates: set, object_id: int
 
 async def cleanup_unused_images(_type, object_id: int, current_content: str, db: AsyncSession) -> None:
     """저장 시, Redis 후보 중 더 이상 쓰이지 않는 이미지를 삭제"""
+    redis_client = get_redis_client()
     current_imgs = extract_img_srcs(current_content)
     print("current_imgs: ", current_imgs)
     key = f"delete_image_candidates:{object_id}"
@@ -85,6 +90,7 @@ async def cleanup_unused_images(_type, object_id: int, current_content: str, db:
 ###############################################################################################################
 async def cleanup_unused_videos(_type, object_id: int, current_content: str, db: AsyncSession) -> None:
     """저장 시, Redis 후보 중 더 이상 쓰이지 않는 이미지를 삭제"""
+    redis_client = get_redis_client()
     current_videos = extract_video_srcs(current_content)
     print("current_videos: ", current_videos)
     key = f"delete_video_candidates:{object_id}"
@@ -102,6 +108,7 @@ async def cleanup_unused_videos(_type, object_id: int, current_content: str, db:
 
 
 async def remove_content_medias(_type, content_medias: set, _id: int, _dir: str, current_user_id: int, db: AsyncSession, key: str) -> None:
+    redis_client = get_redis_client()
     candidate_medias = set(await redis_client.smembers(key))
 
     all_medias = content_medias | candidate_medias  # 합쳐서 삭제 후보

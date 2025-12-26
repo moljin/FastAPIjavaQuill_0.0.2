@@ -15,7 +15,7 @@ from app.apis.articles import comments as apis_articles_comments
 from app.apis import auth as apis_auth
 from app.apis import wysiwyg as apis_wysiwyg
 from app.core.database import ASYNC_ENGINE
-from app.core.redis import redis_client
+from app.core.redis import get_redis_client
 from app.core.settings import STATIC_DIR, MEDIA_DIR, CONFIG, templates
 from app.utils import exc_handler
 from app.utils.apschedulers import scheduler, scheduled_lotto_update
@@ -43,6 +43,7 @@ async def lifespan(app: FastAPI):
     print("Starting Scheduler......")
 
     try:
+        redis_client = get_redis_client()
         await redis_client.ping() # Redis 연결 테스트
         print("Redis connection established......")
     except redis.exceptions.ConnectionError:
@@ -50,6 +51,7 @@ async def lifespan(app: FastAPI):
     print("Starting up...")
     yield
     # FastAPI 인스턴스 종료시 필요한 작업 수행
+    redis_client = get_redis_client()
     await redis_client.aclose()
     print("Redis connection closed......")
     print("Shutting down...")
