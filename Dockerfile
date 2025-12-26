@@ -34,4 +34,5 @@ WORKDIR /home/moljin/FastAPIjavaQuill_0.0.2
 
 # gunicorn -w 9 uvicorn.workers.UvicornWorker main:app
 # gunicorn --bind unix:/tmp/myapi.sock main:app --worker-class uvicorn.workers.UvicornWorker
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-w", "9", "--bind", "unix:/tmp/myapi.sock", "-b", "0.0.0.0:8000", "main:app"]
+#CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-w", "9", "--bind", "unix:/tmp/myapi.sock", "-b", "0.0.0.0:8000", "main:app"]
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-w", "1", "--bind", "unix:/tmp/myapi.sock", "-b", "0.0.0.0:8000", "main:app"]
