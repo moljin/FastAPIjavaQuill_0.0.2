@@ -33,15 +33,4 @@ redis_pool = ConnectionPool(
     socket_timeout=5,
     retry_on_timeout=True,)
 
-# redis_client = Redis(connection_pool=redis_pool)
-
-
-async def get_redis_client():
-    redis = Redis(connection_pool=redis_pool)
-    try:
-        await redis.ping()
-    except Exception:
-        redis = Redis(connection_pool=redis_pool)  # 재생성
-    return redis
-
-redis_client = get_redis_client()
+redis_client = Redis(connection_pool=redis_pool)
