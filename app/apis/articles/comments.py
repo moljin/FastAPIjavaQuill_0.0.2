@@ -38,6 +38,7 @@ async def comment_create(article_id: int,
     # img 임시 후보 키(0)를 실제 article_id 키로 이동
     temp_img_key = "delete_image_candidates:0"
     real_img_key = f"delete_image_candidates:{comment_id}"
+    redis_client = get_redis_client()
     print("await redis_client.exists(temp_img_key)::", await redis_client.exists(temp_img_key))
     """quills content에 이미지를 로드했다가 지우면, 
     await redis_client.exists(temp_img_key)이 1이 되고, if 문을 지나간다. 
@@ -92,6 +93,7 @@ async def update_comment(comment_id: int,
     # img 임시 후보 키(0)를 실제 article_id 키로 이동
     temp_img_key = "delete_image_candidates:0"
     real_img_key = f"delete_image_candidates:{comment_id}"
+    redis_client = get_redis_client()
     print("await redis_client.exists(temp_img_key)::", await redis_client.exists(temp_img_key))
     """quills content에 이미지를 로드했다가 지우면, 
     await redis_client.exists(temp_img_key)이 1이 되고, if 문을 지나간다. 

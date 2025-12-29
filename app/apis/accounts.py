@@ -199,6 +199,7 @@ async def register_user(username: str = Form(...),
         하지만, 이미지등의 파일이 없는 경우는 json으로 받아서 pydantic schema로 검증할 수 있고, 그렇게 하는 것을 권장한다."""
     verified_key = f"verified:{email}"
     session_key = f"user:{email}"
+    redis_client = get_redis_client()
     verified_token = await redis_client.get(verified_key)
     session_data = await redis_client.hgetall(session_key)
 
@@ -266,6 +267,7 @@ async def lost_password_resetting(lost_password_in: UserLostPasswordIn,
 
     verified_key = f"verified:{email}"
     session_key = f"user:{email}"
+    redis_client = get_redis_client()
     verified_token = await redis_client.get(verified_key)
     session_data = await redis_client.hgetall(session_key)
 
