@@ -47,10 +47,28 @@ class AsyncTokenService:
         print("store_refresh_token expire_seconds: ", expire_seconds)
 
         # asyncio 파이프라인
-        async with redis_client.pipeline(transaction=True) as pipe:
-            await pipe.sadd(user_key, refresh_token)
-            await pipe.expire(user_key, expire_seconds)
-            await pipe.execute()
+        # 로그인 시 Refresh Token을 Redis에 저장하는 순간 터졌습니다.
+        # pipeline 사용 시 반드시 예외 처리 + 재시도
+        async def execute_storage(client):
+            async with client.pipeline(transaction=True) as pipe:
+                await pipe.sadd(user_key, refresh_token)
+                await pipe.expire(user_key, expire_seconds)
+                await pipe.execute()
+
+        try:
+            await execute_storage(redis_client)
+        except Exception as e:
+            print(f"Redis 연결 오류 발생, 재시도 중: {e}")
+            # 연결 초기화 (redis.py 구조에 따라 client를 새로 고침)
+            await redis_client.close()
+
+            # 전역 변수 초기화를 위해 redis.py의 로직을 다시 타게 함
+            import app.core.redis as redis_module
+            redis_module.redis_client = None
+            new_client = get_redis_client()
+
+            # 재시도 (한 번 더 실패하면 상위로 예외 던짐)
+            await execute_storage(new_client)
 
         return True
 
