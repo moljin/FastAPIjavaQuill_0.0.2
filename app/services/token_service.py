@@ -18,24 +18,63 @@ class AsyncTokenService:
     async def blacklist_token(cls, token: str, expires_in: int = DEFAULT_TOKEN_EXPIRY) -> bool:
         redis_client = get_redis_client()
         key = f"{TOKEN_BLACKLIST_PREFIX}{token}"
-        await redis_client.set(key, "1", ex=expires_in)
+
+        try:
+            await redis_client.set(key, "1", ex=expires_in)
+        except Exception as e:
+            print(f"Redis 연결 오류 발생, 재시도 중: {e}")
+            # 연결 초기화
+            await redis_client.close()
+
+            # 전역 변수 초기화를 위해 redis.py의 로직을 다시 타게 함
+            import app.core.redis as redis_module
+            redis_module.redis_client = None
+            new_client = get_redis_client()
+
+            # 재시도
+            await new_client.set(key, "1", ex=expires_in)
+
         return True
 
     @classmethod
     async def is_token_blacklisted(cls, token: str) -> bool:
         redis_client = get_redis_client()
         key = f"{TOKEN_BLACKLIST_PREFIX}{token}"
-        return bool(await redis_client.exists(key))
+
+        try:
+            return bool(await redis_client.exists(key))
+        except Exception as e:
+            print(f"Redis 연결 오류 발생, 재시도 중: {e}")
+            await redis_client.close()
+
+            import app.core.redis as redis_module
+            redis_module.redis_client = None
+            new_client = get_redis_client()
+
+            return bool(await new_client.exists(key))
 
     @classmethod
     async def clear_blacklist(cls) -> None:
         redis_client = get_redis_client()
-        # 대량 삭제 최적화: 일괄 수집 후 delete(*keys)
-        keys = []
-        async for key in redis_client.scan_iter(match=f"{TOKEN_BLACKLIST_PREFIX}*"):
-            keys.append(key)
-        if keys:
-            await redis_client.delete(*keys)
+
+        async def execute_clear(client):
+            keys = []
+            async for key in client.scan_iter(match=f"{TOKEN_BLACKLIST_PREFIX}*"):
+                keys.append(key)
+            if keys:
+                await client.delete(*keys)
+
+        try:
+            await execute_clear(redis_client)
+        except Exception as e:
+            print(f"Redis 연결 오류 발생, 재시도 중: {e}")
+            await redis_client.close()
+
+            import app.core.redis as redis_module
+            redis_module.redis_client = None
+            new_client = get_redis_client()
+
+            await execute_clear(new_client)
 
     @classmethod
     async def store_refresh_token(cls, user_id: int, refresh_token: str) -> bool:
@@ -76,14 +115,40 @@ class AsyncTokenService:
     async def validate_refresh_token(cls, user_id: int, refresh_token: str) -> bool:
         redis_client = get_redis_client()
         user_key = f"{REFRESH_TOKEN_PREFIX}{user_id}"
-        return bool(await redis_client.sismember(user_key, refresh_token))
+
+        try:
+            return bool(await redis_client.sismember(user_key, refresh_token))
+        except Exception as e:
+            print(f"Redis 연결 오류 발생, 재시도 중: {e}")
+            await redis_client.close()
+
+            import app.core.redis as redis_module
+            redis_module.redis_client = None
+            new_client = get_redis_client()
+
+            return bool(await new_client.sismember(user_key, refresh_token))
 
     @classmethod
     async def revoke_refresh_token(cls, user_id: int, refresh_token: Optional[str] = None) -> bool:
         redis_client = get_redis_client()
         user_key = f"{REFRESH_TOKEN_PREFIX}{user_id}"
-        if refresh_token:
-            await redis_client.srem(user_key, refresh_token)
-        else:
-            await redis_client.delete(user_key)
+
+        async def execute_revoke(client):
+            if refresh_token:
+                await client.srem(user_key, refresh_token)
+            else:
+                await client.delete(user_key)
+
+        try:
+            await execute_revoke(redis_client)
+        except Exception as e:
+            print(f"Redis 연결 오류 발생, 재시도 중: {e}")
+            await redis_client.close()
+
+            import app.core.redis as redis_module
+            redis_module.redis_client = None
+            new_client = get_redis_client()
+
+            await execute_revoke(new_client)
+
         return True
